@@ -42,8 +42,6 @@ defmodule MindsterGamesWeb do
         formats: [:html, :json],
         layouts: [html: MindsterGamesWeb.Layouts]
 
-      use Gettext, backend: MindsterGamesWeb.Gettext
-
       import Plug.Conn
 
       unquote(verified_routes())
@@ -83,7 +81,6 @@ defmodule MindsterGamesWeb do
   defp html_helpers do
     quote do
       # Translation
-      use Gettext, backend: MindsterGamesWeb.Gettext
 
       # HTML escaping functionality
       import Phoenix.HTML

@@ -16,8 +16,6 @@ defmodule MindsterGamesWeb.Router do
 
   scope "/", MindsterGamesWeb do
     pipe_through :browser
-
-    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
@@ -25,7 +23,6 @@ defmodule MindsterGamesWeb.Router do
   #   pipe_through :api
   # end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:mindster_games, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
@@ -38,7 +35,6 @@ defmodule MindsterGamesWeb.Router do
       pipe_through :browser
 
       live_dashboard "/dashboard", metrics: MindsterGamesWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
 end
