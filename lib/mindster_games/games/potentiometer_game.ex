@@ -13,15 +13,15 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   defmachine field: :state do
     state :awaiting_players
-    state :starting_game, after_enter: &MindsterGames.Games.PotentiometerGame.setup_game/1
+    state :starting_game, after_enter: &MindsterGames.Games.PotentiometerGame.setup_game/2
     state :hinter_picking, after_enter: &MindsterGames.Games.PotentiometerGame.setup_hinter_picking/1
     state :guesser_picking
     state :reveal_result, after_enter: &MindsterGames.Games.PotentiometerGame.calculate_points/1
     state :game_finished, after_enter: &MindsterGames.Games.PotentiometerGame.determine_winner/1
 
-    event :player_joined, after: &MindsterGames.Games.PotentiometerGame.add_player/1 do
+    event :player_joined, before: &MindsterGames.Games.PotentiometerGame.add_player/2 do
       transition from: :awaiting_players, to: :starting_game,
-        if: &MindsterGames.Games.PotentiometerGame.player_count_valid?/1
+        if: &MindsterGames.Games.PotentiometerGame.player_count_valid?/2
       transition from: :awaiting_players, to: :awaiting_players
     end
 
@@ -47,9 +47,9 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   # Event callbacks to handle payloads
-  def add_player(context) do
-    player = context.payload.player
-    updated_model = %{context.model | players: context.model.players ++ [player]}
+  def add_player(model, %{payload: payload}) do
+    player = payload.player
+    updated_model = %{model | players: model.players ++ [player]}
     {:ok, updated_model}
   end
 
@@ -73,16 +73,18 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   # State callbacks
-  def setup_game(context) do
+  def setup_game(model, _ctx) do
+    model.players |> dbg()
+    [player1, player2, player3, player4] = model.players
     updated_model = %{
-      context.model
+      model
       | round: 1,
         teams: [
-          %{points: 0, players: [context.model.players[0], context.model.players[1]]},
-          %{points: 0, players: [context.model.players[2], context.model.players[3]]}
+          %{points: 0, players: [player1, player2]},
+          %{points: 0, players: [player3, player4]}
         ],
         current_team: 0,
-        current_hinter: context.model.players[0]
+        current_hinter: player1
     }
     {:ok, updated_model}
   end
@@ -133,12 +135,12 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   # Guards
-  def player_count_valid?(context) do
-    length(context.model.players) == 4
+  def player_count_valid?(model, _ctx) do
+    (length(model.players) +1) == 4
   end
 
-  def no_team_has_won?(context) do
-    not Enum.any?(context.model.teams, fn team -> team.points >= 5 end)
+  def no_team_has_won?(model) do
+    not Enum.any?(model.teams, fn team -> team.points >= 5 end)
   end
 
   # Helper functions
