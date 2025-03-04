@@ -14,8 +14,12 @@ defmodule MindsterGamesWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", MindsterGamesWeb do
+  scope "/" do
     pipe_through :browser
+
+    live_session :default do
+      live("/", MindsterGamesWeb.Live.Index)
+    end
   end
 
   # Other scopes may use custom stacks.
