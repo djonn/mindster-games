@@ -7,12 +7,6 @@ config :mindster_games, MindsterGamesWeb.Endpoint,
   secret_key_base: "JHmlS9h5DXFHGTL1qBGZckdwWyMiyAu44bqDpgkge5bxHUGODixWoD7+EXEkbBfl",
   server: false
 
-# In test we don't send emails
-config :mindster_games, MindsterGames.Mailer, adapter: Swoosh.Adapters.Test
-
-# Disable swoosh api client as it is only required for production adapters
-config :swoosh, :api_client, false
-
 # Print only warnings and errors during test
 config :logger, level: :warning
 
