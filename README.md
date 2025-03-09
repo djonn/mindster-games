@@ -2,10 +2,10 @@
 
 ## TODO
 
-[] Reconnect based on csrf token
-[] Leave game
-[] Pick name (just csrf token for now)
-[] Create Room and pick game
+- [ ] Reconnect based on csrf token
+- [ ] Leave game
+- [ ] Pick name (just csrf token for now)
+- [ ] Create Room and pick game
 
 ## Development
 To start your Phoenix server:
