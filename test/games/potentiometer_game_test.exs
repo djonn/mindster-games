@@ -19,5 +19,4 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
     assert state.players == [player1, player2, player3, player4]
     assert state.state == :starting_game
   end
-
 end
