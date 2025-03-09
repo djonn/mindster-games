@@ -9,7 +9,6 @@ defmodule MindsterGames.Application do
   def start(_type, _args) do
     children = [
       MindsterGamesWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:mindster_games, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: MindsterGames.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: MindsterGames.Finch},
