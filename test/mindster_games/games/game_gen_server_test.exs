@@ -2,9 +2,10 @@ defmodule MindsterGames.Games.GameGenServerTest do
   use MindsterGamesWeb.DataCase
   alias MindsterGames.Games.GameGenServer
 
-  describe "join_game/3 - " do
+  describe "join_game/2 - " do
     setup do
-      {:ok, game_pid} = GameGenServer.start_link("AB12")
+      game_id = "AB12"
+      {:ok, game_pid} = GameGenServer.start_link(game_id)
       {:ok, %{game_pid: game_pid}}
     end
 

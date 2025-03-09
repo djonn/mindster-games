@@ -15,7 +15,8 @@ defmodule MindsterGames.Application do
       # Start a worker by calling: MindsterGames.Worker.start_link(arg)
       # {MindsterGames.Worker, arg},
       # Start to serve requests, typically the last entry
-      MindsterGamesWeb.Endpoint
+      MindsterGamesWeb.Endpoint,
+      MindsterGames.Games.GameGenServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -30,5 +31,11 @@ defmodule MindsterGames.Application do
   def config_change(changed, _new, removed) do
     MindsterGamesWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  def game_pid() do
+    Supervisor.which_children(MindsterGames.Supervisor)
+    |> Enum.find(fn child -> elem(child, 0) == MindsterGames.Games.GameGenServer end)
+    |> elem(1)
   end
 end

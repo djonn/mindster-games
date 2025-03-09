@@ -3,7 +3,7 @@ defmodule MindsterGamesWeb.Live.Room.Board.Index do
 
   def render(assigns) do
     ~H"""
-    This is the view
+    This is the board view
     """
   end
 end

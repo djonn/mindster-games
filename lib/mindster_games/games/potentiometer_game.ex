@@ -1,7 +1,8 @@
 defmodule MindsterGames.Games.PotentiometerGame do
   use StateMachine
 
-  defstruct players: [],
+  defstruct id: "AB12",
+            players: [],
             teams: [],
             round: 0,
             current_team: nil,
