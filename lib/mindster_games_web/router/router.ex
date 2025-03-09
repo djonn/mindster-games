@@ -17,8 +17,10 @@ defmodule MindsterGamesWeb.Router do
   scope "/" do
     pipe_through :browser
 
-    live_session :default do
+    live_session :default, on_mount: {MindsterGamesWeb.Router.MountHooks, :default} do
       live("/", MindsterGamesWeb.Live.Index)
+      live("/:room_id", MindsterGamesWeb.Live.Room.Index)
+      live("/:room_id/board", MindsterGamesWeb.Live.Room.Board.Index)
     end
   end
 
