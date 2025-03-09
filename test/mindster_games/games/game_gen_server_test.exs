@@ -1,0 +1,26 @@
+defmodule MindsterGames.Games.GameGenServerTest do
+  use MindsterGamesWeb.DataCase
+  alias MindsterGames.Games.GameGenServer
+
+  describe "join_game/3 - " do
+    setup do
+      {:ok, game_pid} = GameGenServer.start_link("AB12")
+      {:ok, %{game_pid: game_pid}}
+    end
+
+    test "player can join game", %{game_pid: game_pid} do
+      player = "rolf"
+      GameGenServer.join_game(game_pid, player)
+      state = GameGenServer.get_current_state(game_pid)
+      assert state.players == [player]
+    end
+
+    test "player can only join game once", %{game_pid: game_pid} do
+      player = "rolf"
+      GameGenServer.join_game(game_pid, player)
+      GameGenServer.join_game(game_pid, player)
+      state = GameGenServer.get_current_state(game_pid)
+      assert state.players == [player]
+    end
+  end
+end

@@ -21,10 +21,31 @@ defmodule MindsterGames.Games.GameGenServer do
     GenServer.call(pid, :info)
   end
 
+  def join_game(pid, player) do
+    GenServer.call(pid, {:join_game, player})
+  end
+
+  def get_current_state(pid) do
+    GenServer.call(pid, :get_current_state)
+  end
+
   # ---- Server Callbacks -------
   def handle_call({:trigger, event, payload}, _from, state) do
     {:ok, new_state} = PotentiometerGame.trigger(state, event, payload)
     {:reply, new_state, new_state}
+  end
+
+  def handle_call({:join_game, player}, _from, state) do
+    if Enum.any?(state.players, fn current_player -> current_player == player end) do
+      {:reply, {:ok, state}, state}
+    else
+      {:ok, new_state} = PotentiometerGame.trigger(state, :player_joined, %{player: player})
+      {:reply, {:ok, new_state}, new_state}
+    end
+  end
+
+  def handle_call(:get_current_state, _from, state) do
+    {:reply, state, state}
   end
 
   def handle_call(:info, _from, state) do
