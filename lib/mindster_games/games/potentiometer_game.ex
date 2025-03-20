@@ -9,6 +9,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
             current_goal: nil,
             current_scale: nil,
             current_guess: nil,
+            winning_team: nil,
             state: :awaiting_players
 
   defmachine field: :state do
@@ -33,7 +34,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
       transition(from: :hinter_picking, to: :guesser_picking)
     end
 
-    event :guesser_submits, after: &__MODULE__.record_guess/2 do
+    event :guesser_submits, before: &__MODULE__.record_guess/2 do
       transition(from: :guesser_picking, to: :reveal_result)
     end
 
@@ -146,7 +147,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
         team.points >= 5
       end)
 
-    updated_model = %__MODULE__{model | current_team: winner_index}
+    updated_model = %__MODULE__{model | winning_team: winner_index}
     {:ok, updated_model}
   end
 
