@@ -3,8 +3,14 @@ defmodule MindsterGames.Games.GameGenServer do
 
   alias MindsterGames.Games.PotentiometerGame
 
-  def start_link(_initial_state, opts \\ []) do
+  def start_link(initial_state \\ nil, opts \\ [])
+
+  def start_link(initial_state, opts) when is_nil(initial_state) do
     initial_state = %PotentiometerGame{}
+    GenServer.start_link(__MODULE__, initial_state, opts)
+  end
+
+  def start_link(initial_state, opts) do
     GenServer.start_link(__MODULE__, initial_state, opts)
   end
 

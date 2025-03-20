@@ -3,7 +3,7 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   alias MindsterGames.Games.GameGenServer
 
   test "When new game starts then game is awaiting players" do
-    {:ok, game_pid} = GameGenServer.start_link(nil)
+    {:ok, game_pid} = GameGenServer.start_link()
 
     state = GameGenServer.info(game_pid)
     assert state.players == []
@@ -11,7 +11,7 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   end
 
   test "When fewer than 4 players join then game is still awaiting players" do
-    {:ok, game_pid} = GameGenServer.start_link(nil)
+    {:ok, game_pid} = GameGenServer.start_link()
 
     player1 = "player1"
     player2 = "player2"
@@ -25,7 +25,7 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   end
 
   test "4 players join and the game starts" do
-    {:ok, game_pid} = GameGenServer.start_link(nil)
+    {:ok, game_pid} = GameGenServer.start_link()
 
     player1 = "player1"
     player2 = "player2"
