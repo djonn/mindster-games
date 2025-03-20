@@ -12,33 +12,35 @@ defmodule MindsterGames.Games.PotentiometerGame do
             state: :awaiting_players
 
   defmachine field: :state do
-    state :awaiting_players
-    state :starting_game, after_enter: &MindsterGames.Games.PotentiometerGame.setup_game/2
-    state :hinter_picking, after_enter: &MindsterGames.Games.PotentiometerGame.setup_hinter_picking/1
-    state :guesser_picking
-    state :reveal_result, after_enter: &MindsterGames.Games.PotentiometerGame.calculate_points/1
-    state :game_finished, after_enter: &MindsterGames.Games.PotentiometerGame.determine_winner/1
+    state(:awaiting_players)
+    state(:starting_game, after_enter: &__MODULE__.setup_game/2)
+    state(:hinter_picking, after_enter: &__MODULE__.setup_hinter_picking/1)
+    state(:guesser_picking)
+    state(:reveal_result, after_enter: &__MODULE__.calculate_points/1)
+    state(:game_finished, after_enter: &__MODULE__.determine_winner/1)
 
-    event :player_joined, before: &MindsterGames.Games.PotentiometerGame.add_player/2 do
-      transition from: :awaiting_players, to: :starting_game,
-        if: &MindsterGames.Games.PotentiometerGame.player_count_valid?/2
-      transition from: :awaiting_players, to: :awaiting_players
+    event :player_joined, before: &__MODULE__.add_player/2 do
+      transition(
+        from: :awaiting_players,
+        to: :starting_game,
+        if: &__MODULE__.player_count_valid?/2
+      )
+
+      transition(from: :awaiting_players, to: :awaiting_players)
     end
 
     event :hinter_ready do
       transition from: :starting_game, to: :hinter_picking
     end
 
-    event :guesser_submits, after: &MindsterGames.Games.PotentiometerGame.record_guess/1 do
-      transition from: :hinter_picking, to: :guesser_picking
-      transition from: :guesser_picking, to: :reveal_result
+    event :guesser_submits, after: &__MODULE__.record_guess/1 do
+      transition(from: :hinter_picking, to: :guesser_picking)
+      transition(from: :guesser_picking, to: :reveal_result)
     end
 
-    event :next_round, after: &MindsterGames.Games.PotentiometerGame.rotate_team_and_hinter/1 do
-      transition from: :reveal_result, to: :hinter_picking,
-        if: &MindsterGames.Games.PotentiometerGame.no_team_has_won?/1
-      transition from: :reveal_result, to: :game_finished,
-        unless: &MindsterGames.Games.PotentiometerGame.no_team_has_won?/1
+    event :next_round, after: &__MODULE__.rotate_team_and_hinter/1 do
+      transition(from: :reveal_result, to: :hinter_picking, if: &__MODULE__.no_team_has_won?/1)
+      transition(from: :reveal_result, to: :game_finished, unless: &__MODULE__.no_team_has_won?/1)
     end
 
     event :game_end do
