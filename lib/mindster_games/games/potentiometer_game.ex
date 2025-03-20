@@ -74,16 +74,20 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   # State callbacks
   def setup_game(model, _ctx) do
-    [player1, player2, player3, player4] = model.players
+    {team1, team2} =
+      model.players
+      |> Enum.shuffle()
+      |> Enum.split(2)
+
     updated_model = %{
       model
       | round: 1,
         teams: [
-          %{points: 0, players: [player1, player2]},
-          %{points: 0, players: [player3, player4]}
+          %{points: 0, players: team1},
+          %{points: 0, players: team2}
         ],
         current_team: 0,
-        current_hinter: player1
+        current_hinter: hd(team1)
     }
     {:ok, updated_model}
   end
