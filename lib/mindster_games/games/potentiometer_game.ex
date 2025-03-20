@@ -51,13 +51,13 @@ defmodule MindsterGames.Games.PotentiometerGame do
   # Event callbacks to handle payloads
   def add_player(model, %{payload: payload}) do
     player = payload.player
-    updated_model = %{model | players: model.players ++ [player]}
+    updated_model = %__MODULE__{model | players: model.players ++ [player]}
     {:ok, updated_model}
   end
 
   def record_guess(context) do
     guess = context.payload.guess
-    updated_model = %{context.model | current_guess: guess}
+    updated_model = %__MODULE__{context.model | current_guess: guess}
     {:ok, updated_model}
   end
 
@@ -65,10 +65,11 @@ defmodule MindsterGames.Games.PotentiometerGame do
     # Rotate to next hinter and team
     {next_team_index, next_hinter} = get_next_team_and_hinter(context.model)
 
-    updated_model = %{context.model |
-      round: context.model.round + 1,
-      current_team: next_team_index,
-      current_hinter: next_hinter
+    updated_model = %__MODULE__{
+      context.model
+      | round: context.model.round + 1,
+        current_team: next_team_index,
+        current_hinter: next_hinter
     }
 
     {:ok, updated_model}
@@ -81,7 +82,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
       |> Enum.shuffle()
       |> Enum.split(2)
 
-    updated_model = %{
+    updated_model = %__MODULE__{
       model
       | round: 1,
         teams: [
@@ -99,15 +100,22 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
     # full list in their translation sheet
     # https://docs.google.com/spreadsheets/d/1F4Afm5jF71LiLWyE1I98mFlwGbWOrabLDLaG6WJf_ak/edit?gid=1038837635#gid=1038837635
-    random_scale = [
-      {"Good habit", "Bad habit"},
-      {"Dog person", "Cat person"},
-      {"Expensive", "Cheap"},
-      {"Daytime activity", "Nighttime activity"},
-      {"Meal", "Snack"}
-    ] |> Enum.random()
+    random_scale =
+      [
+        {"Good habit", "Bad habit"},
+        {"Dog person", "Cat person"},
+        {"Expensive", "Cheap"},
+        {"Daytime activity", "Nighttime activity"},
+        {"Meal", "Snack"}
+      ]
+      |> Enum.random()
 
-    updated_model = %{context.model | current_goal: random_goal, current_scale: random_scale}
+    updated_model = %__MODULE__{
+      context.model
+      | current_goal: random_goal,
+        current_scale: random_scale
+    }
+
     {:ok, updated_model}
   end
 
@@ -125,7 +133,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
       %{team | points: team.points + points}
     end)
 
-    updated_model = %{context.model | teams: updated_teams}
+    updated_model = %__MODULE__{context.model | teams: updated_teams}
     {:ok, updated_model}
   end
 
@@ -135,7 +143,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
       team.points >= 5
     end)
 
-    updated_model = %{context.model | current_team: winner_index}
+    updated_model = %__MODULE__{context.model | current_team: winner_index}
     {:ok, updated_model}
   end
 
