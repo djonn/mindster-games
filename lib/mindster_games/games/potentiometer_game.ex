@@ -13,7 +13,6 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   defmachine field: :state do
     state(:awaiting_players)
-    state(:starting_game, after_enter: &__MODULE__.setup_game/2)
     state(:hinter_picking, after_enter: &__MODULE__.setup_hinter_picking/2)
     state(:guesser_picking)
     state(:reveal_result, after_enter: &__MODULE__.calculate_points/2)
@@ -22,19 +21,19 @@ defmodule MindsterGames.Games.PotentiometerGame do
     event :player_joined, before: &__MODULE__.add_player/2 do
       transition(
         from: :awaiting_players,
-        to: :starting_game,
-        if: &__MODULE__.player_count_valid?/2
+        to: :hinter_picking,
+        if: &__MODULE__.player_count_valid?/2,
+        after: &__MODULE__.initialize_teams/2
       )
 
       transition(from: :awaiting_players, to: :awaiting_players)
     end
 
     event :hinter_ready do
-      transition(from: :starting_game, to: :hinter_picking)
+      transition(from: :hinter_picking, to: :guesser_picking)
     end
 
     event :guesser_submits, after: &__MODULE__.record_guess/2 do
-      transition(from: :hinter_picking, to: :guesser_picking)
       transition(from: :guesser_picking, to: :reveal_result)
     end
 
@@ -76,7 +75,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   # State callbacks
-  def setup_game(model, _ctx) do
+  def initialize_teams(model, _ctx) do
     {team1, team2} =
       model.players
       |> Enum.shuffle()

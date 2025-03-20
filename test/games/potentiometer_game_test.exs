@@ -40,13 +40,19 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
 
     state = GameGenServer.info(game_pid)
     assert state.players == [player1, player2, player3, player4]
-    assert state.state == :starting_game
+    assert state.state == :hinter_picking
   end
 
-  test "When starting game and hinter is ready then hinter can start picking" do
+  test "When starting game and hint has been given, then guesser can start" do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
-      state: :starting_game
+      teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      round: 1,
+      current_team: 0,
+      current_hinter: "player1",
+      current_goal: 50,
+      current_scale: {"good", "bad"},
+      state: :hinter_picking
     }
 
     {:ok, game_pid} = GameGenServer.start_link(existing_state)
@@ -54,7 +60,7 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
     GameGenServer.trigger(game_pid, :hinter_ready)
 
     state = GameGenServer.info(game_pid)
-    assert state.state == :hinter_picking
+    assert state.state == :guesser_picking
     assert is_number(state.current_goal)
     assert {left, right} = state.current_scale
     assert is_binary(left)
