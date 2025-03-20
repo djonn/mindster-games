@@ -30,7 +30,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
     end
 
     event :hinter_ready do
-      transition from: :starting_game, to: :hinter_picking
+      transition(from: :starting_game, to: :hinter_picking)
     end
 
     event :guesser_submits, after: &__MODULE__.record_guess/1 do
@@ -44,7 +44,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
     end
 
     event :game_end do
-      transition from: :game_finished, to: :awaiting_players
+      transition(from: :game_finished, to: :awaiting_players)
     end
   end
 
@@ -92,6 +92,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
         current_team: 0,
         current_hinter: hd(team1)
     }
+
     {:ok, updated_model}
   end
 
@@ -120,18 +121,20 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   def calculate_points(context) do
-    points = case abs(context.model.current_goal - context.model.current_guess) do
-      diff when diff <= 10 -> 4
-      diff when diff <= 20 -> 3
-      diff when diff <= 30 -> 2
-      diff when diff <= 40 -> 1
-      _ -> 0
-    end
+    points =
+      case abs(context.model.current_goal - context.model.current_guess) do
+        diff when diff <= 10 -> 4
+        diff when diff <= 20 -> 3
+        diff when diff <= 30 -> 2
+        diff when diff <= 40 -> 1
+        _ -> 0
+      end
 
     # Update the current team's points
-    updated_teams = List.update_at(context.model.teams, context.model.current_team, fn team ->
-      %{team | points: team.points + points}
-    end)
+    updated_teams =
+      List.update_at(context.model.teams, context.model.current_team, fn team ->
+        %{team | points: team.points + points}
+      end)
 
     updated_model = %__MODULE__{context.model | teams: updated_teams}
     {:ok, updated_model}
@@ -139,9 +142,10 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   def determine_winner(context) do
     # Find the team with the highest points
-    winner_index = Enum.find_index(context.model.teams, fn team ->
-      team.points >= 5
-    end)
+    winner_index =
+      Enum.find_index(context.model.teams, fn team ->
+        team.points >= 5
+      end)
 
     updated_model = %__MODULE__{context.model | current_team: winner_index}
     {:ok, updated_model}
@@ -149,7 +153,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   # Guards
   def player_count_valid?(model, _ctx) do
-    (length(model.players) +1) == 4
+    length(model.players) + 1 == 4
   end
 
   def no_team_has_won?(model) do
@@ -163,15 +167,18 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
     # Get the next hinter from the team
     team = Enum.at(state.teams, next_team_index)
-    current_hinter_index = Enum.find_index(team.players, fn player ->
-      player == state.current_hinter
-    end)
 
-    next_hinter_index = if current_hinter_index == nil do
-      0
-    else
-      rem(current_hinter_index + 1, length(team.players))
-    end
+    current_hinter_index =
+      Enum.find_index(team.players, fn player ->
+        player == state.current_hinter
+      end)
+
+    next_hinter_index =
+      if current_hinter_index == nil do
+        0
+      else
+        rem(current_hinter_index + 1, length(team.players))
+      end
 
     next_hinter = Enum.at(team.players, next_hinter_index)
 
