@@ -14,10 +14,10 @@ defmodule MindsterGames.Games.PotentiometerGame do
   defmachine field: :state do
     state(:awaiting_players)
     state(:starting_game, after_enter: &__MODULE__.setup_game/2)
-    state(:hinter_picking, after_enter: &__MODULE__.setup_hinter_picking/1)
+    state(:hinter_picking, after_enter: &__MODULE__.setup_hinter_picking/2)
     state(:guesser_picking)
-    state(:reveal_result, after_enter: &__MODULE__.calculate_points/1)
-    state(:game_finished, after_enter: &__MODULE__.determine_winner/1)
+    state(:reveal_result, after_enter: &__MODULE__.calculate_points/2)
+    state(:game_finished, after_enter: &__MODULE__.determine_winner/2)
 
     event :player_joined, before: &__MODULE__.add_player/2 do
       transition(
@@ -33,14 +33,14 @@ defmodule MindsterGames.Games.PotentiometerGame do
       transition(from: :starting_game, to: :hinter_picking)
     end
 
-    event :guesser_submits, after: &__MODULE__.record_guess/1 do
+    event :guesser_submits, after: &__MODULE__.record_guess/2 do
       transition(from: :hinter_picking, to: :guesser_picking)
       transition(from: :guesser_picking, to: :reveal_result)
     end
 
-    event :next_round, after: &__MODULE__.rotate_team_and_hinter/1 do
-      transition(from: :reveal_result, to: :hinter_picking, if: &__MODULE__.no_team_has_won?/1)
-      transition(from: :reveal_result, to: :game_finished, unless: &__MODULE__.no_team_has_won?/1)
+    event :next_round, after: &__MODULE__.rotate_team_and_hinter/2 do
+      transition(from: :reveal_result, to: :hinter_picking, if: &__MODULE__.no_team_has_won?/2)
+      transition(from: :reveal_result, to: :game_finished, unless: &__MODULE__.no_team_has_won?/2)
     end
 
     event :game_end do
@@ -55,19 +55,19 @@ defmodule MindsterGames.Games.PotentiometerGame do
     {:ok, updated_model}
   end
 
-  def record_guess(context) do
-    guess = context.payload.guess
-    updated_model = %__MODULE__{context.model | current_guess: guess}
+  def record_guess(model, %{payload: payload}) do
+    guess = payload.guess
+    updated_model = %__MODULE__{model | current_guess: guess}
     {:ok, updated_model}
   end
 
-  def rotate_team_and_hinter(context) do
+  def rotate_team_and_hinter(model, _ctx) do
     # Rotate to next hinter and team
-    {next_team_index, next_hinter} = get_next_team_and_hinter(context.model)
+    {next_team_index, next_hinter} = get_next_team_and_hinter(model)
 
     updated_model = %__MODULE__{
-      context.model
-      | round: context.model.round + 1,
+      model
+      | round: model.round + 1,
         current_team: next_team_index,
         current_hinter: next_hinter
     }
@@ -96,7 +96,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
     {:ok, updated_model}
   end
 
-  def setup_hinter_picking(context) do
+  def setup_hinter_picking(model, _ctx) do
     random_goal = Enum.random(1..100)
 
     # full list in their translation sheet
@@ -112,7 +112,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
       |> Enum.random()
 
     updated_model = %__MODULE__{
-      context.model
+      model
       | current_goal: random_goal,
         current_scale: random_scale
     }
@@ -120,9 +120,9 @@ defmodule MindsterGames.Games.PotentiometerGame do
     {:ok, updated_model}
   end
 
-  def calculate_points(context) do
+  def calculate_points(model, _ctx) do
     points =
-      case abs(context.model.current_goal - context.model.current_guess) do
+      case abs(model.current_goal - model.current_guess) do
         diff when diff <= 10 -> 4
         diff when diff <= 20 -> 3
         diff when diff <= 30 -> 2
@@ -132,22 +132,22 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
     # Update the current team's points
     updated_teams =
-      List.update_at(context.model.teams, context.model.current_team, fn team ->
+      List.update_at(model.teams, model.current_team, fn team ->
         %{team | points: team.points + points}
       end)
 
-    updated_model = %__MODULE__{context.model | teams: updated_teams}
+    updated_model = %__MODULE__{model | teams: updated_teams}
     {:ok, updated_model}
   end
 
-  def determine_winner(context) do
+  def determine_winner(model, _ctx) do
     # Find the team with the highest points
     winner_index =
-      Enum.find_index(context.model.teams, fn team ->
+      Enum.find_index(model.teams, fn team ->
         team.points >= 5
       end)
 
-    updated_model = %__MODULE__{context.model | current_team: winner_index}
+    updated_model = %__MODULE__{model | current_team: winner_index}
     {:ok, updated_model}
   end
 
@@ -156,7 +156,7 @@ defmodule MindsterGames.Games.PotentiometerGame do
     length(model.players) + 1 == 4
   end
 
-  def no_team_has_won?(model) do
+  def no_team_has_won?(model, _ctx) do
     not Enum.any?(model.teams, fn team -> team.points >= 5 end)
   end
 
