@@ -55,10 +55,14 @@ defmodule MindsterGames.Games.PotentiometerGame do
     {:ok, updated_model}
   end
 
-  def record_guess(model, %{payload: payload}) do
+  def record_guess(model, %{payload: payload}) when is_integer(payload.guess) do
     guess = payload.guess
     updated_model = %__MODULE__{model | current_guess: guess}
     {:ok, updated_model}
+  end
+
+  def record_guess(_model, _ctx) do
+    {:error, "Guess must be an integer"}
   end
 
   def rotate_team_and_hinter(model, _ctx) do
