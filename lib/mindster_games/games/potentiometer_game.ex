@@ -67,7 +67,9 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   def rotate_team_and_hinter(model, _ctx) do
     next_round = model.round + 1
-    {next_team_index, next_hinter} = get_current_team_and_hinter(%__MODULE__{model | round: next_round})
+
+    {next_team_index, next_hinter} =
+      get_current_team_and_hinter(%__MODULE__{model | round: next_round})
 
     updated_model = %__MODULE__{
       model

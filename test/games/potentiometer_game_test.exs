@@ -46,7 +46,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   test "When starting game and hint has been given, then guesser can start" do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
-      teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 0, players: ["player1", "player2"]},
+        %{points: 0, players: ["player3", "player4"]}
+      ],
       round: 1,
       current_team: 0,
       current_hinter: "player1",
@@ -72,7 +75,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   test "When hinter is chosen then hinter can provide a clue" do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
-      teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 0, players: ["player1", "player2"]},
+        %{points: 0, players: ["player3", "player4"]}
+      ],
       round: 1,
       current_team: 0,
       current_hinter: "player1",
@@ -96,7 +102,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
       existing_state = %PotentiometerGame{
         players: ["player1", "player2", "player3", "player4"],
         state: :guesser_picking,
-        teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+        teams: [
+          %{points: 0, players: ["player1", "player2"]},
+          %{points: 0, players: ["player3", "player4"]}
+        ],
         current_team: 0,
         current_goal: 50,
         current_guess: nil
@@ -147,7 +156,9 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
       assert hd(state.teams).points == 1
     end
 
-    test "When guess is more than 40 away from goal then team scores 0 points", %{game_pid: game_pid} do
+    test "When guess is more than 40 away from goal then team scores 0 points", %{
+      game_pid: game_pid
+    } do
       response = GameGenServer.trigger(game_pid, :guesser_submits, %{guess: 95})
 
       assert not is_error?(response)
@@ -161,7 +172,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   test "When guesser submits a guess then result is revealed" do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
-      teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 0, players: ["player1", "player2"]},
+        %{points: 0, players: ["player3", "player4"]}
+      ],
       round: 1,
       current_team: 0,
       current_hinter: "player1",
@@ -184,7 +198,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
       # scores are below winning threshold
-      teams: [%{points: 3, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 3, players: ["player1", "player2"]},
+        %{points: 0, players: ["player3", "player4"]}
+      ],
       round: 1,
       current_team: 0,
       current_hinter: "player1",
@@ -216,7 +233,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
       # scores are above winning threshold
-      teams: [%{points: 3, players: ["player1", "player2"]}, %{points: 7, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 3, players: ["player1", "player2"]},
+        %{points: 7, players: ["player3", "player4"]}
+      ],
       round: 1,
       current_team: 0,
       current_hinter: "player1",
@@ -278,7 +298,10 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
   test "When next round starts then teams and roles rotate" do
     existing_state = %PotentiometerGame{
       players: ["player1", "player2", "player3", "player4"],
-      teams: [%{points: 0, players: ["player1", "player2"]}, %{points: 0, players: ["player3", "player4"]}],
+      teams: [
+        %{points: 0, players: ["player1", "player2"]},
+        %{points: 0, players: ["player3", "player4"]}
+      ],
       state: :reveal_result,
       round: 0,
       current_team: 0,
@@ -299,7 +322,6 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
 
     assert state.current_team == 1
     assert state.current_hinter == "player3"
-
   end
 
   test "When an invalid guess is submitted then state does not change" do
@@ -324,5 +346,4 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
       _ -> false
     end
   end
-
 end

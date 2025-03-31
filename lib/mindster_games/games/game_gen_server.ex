@@ -30,7 +30,9 @@ defmodule MindsterGames.Games.GameGenServer do
   # ---- Server Callbacks -------
   def handle_call({:trigger, event, payload}, _from, state) do
     case PotentiometerGame.trigger(state, event, payload) do
-      {:ok, new_state} -> {:reply, new_state, new_state}
+      {:ok, new_state} ->
+        {:reply, new_state, new_state}
+
       {:error, _} = error ->
         # The error message here could be improved
         # when the state machine cannot apply an event it returns
