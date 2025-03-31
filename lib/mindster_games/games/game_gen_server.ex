@@ -29,8 +29,14 @@ defmodule MindsterGames.Games.GameGenServer do
 
   # ---- Server Callbacks -------
   def handle_call({:trigger, event, payload}, _from, state) do
-    {:ok, new_state} = PotentiometerGame.trigger(state, event, payload)
-    {:reply, new_state, new_state}
+    case PotentiometerGame.trigger(state, event, payload) do
+      {:ok, new_state} -> {:reply, new_state, new_state}
+      {:error, _} = error ->
+        # The error message here could be improved
+        # when the state machine cannot apply an event it returns
+        # `{:error, {:transition, "Couldn't resolve transition"}}`
+        {:reply, error, state}
+    end
   end
 
   def handle_call(:info, _from, state) do
