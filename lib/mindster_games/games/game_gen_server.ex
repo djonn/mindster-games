@@ -3,8 +3,14 @@ defmodule MindsterGames.Games.GameGenServer do
 
   alias MindsterGames.Games.PotentiometerGame
 
-  def start_link(_initial_state, opts \\ []) do
+  def start_link(initial_state \\ nil, opts \\ [])
+
+  def start_link(initial_state, opts) when is_nil(initial_state) do
     initial_state = %PotentiometerGame{}
+    GenServer.start_link(__MODULE__, initial_state, opts)
+  end
+
+  def start_link(initial_state, opts) do
     GenServer.start_link(__MODULE__, initial_state, opts)
   end
 
@@ -21,31 +27,16 @@ defmodule MindsterGames.Games.GameGenServer do
     GenServer.call(pid, :info)
   end
 
-  def join_game(pid, player) do
-    GenServer.call(pid, {:join_game, player})
-  end
-
-  def get_current_state(pid) do
-    GenServer.call(pid, :get_current_state)
-  end
-
   # ---- Server Callbacks -------
   def handle_call({:trigger, event, payload}, _from, state) do
-    {:ok, new_state} = PotentiometerGame.trigger(state, event, payload)
-    {:reply, new_state, new_state}
-  end
-
-  def handle_call({:join_game, player}, _from, state) do
-    if Enum.any?(state.players, fn current_player -> current_player == player end) do
-      {:reply, {:ok, state}, state}
-    else
-      {:ok, new_state} = PotentiometerGame.trigger(state, :player_joined, %{player: player})
-      {:reply, {:ok, new_state}, new_state}
+    case PotentiometerGame.trigger(state, event, payload) do
+      {:ok, new_state} -> {:reply, new_state, new_state}
+      {:error, _} = error ->
+        # The error message here could be improved
+        # when the state machine cannot apply an event it returns
+        # `{:error, {:transition, "Couldn't resolve transition"}}`
+        {:reply, error, state}
     end
-  end
-
-  def handle_call(:get_current_state, _from, state) do
-    {:reply, state, state}
   end
 
   def handle_call(:info, _from, state) do
