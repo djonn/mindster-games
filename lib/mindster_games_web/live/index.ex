@@ -41,13 +41,17 @@ defmodule MindsterGamesWeb.Live.Index do
   def handle_event("join-room", %{"game_id" => _game_id}, socket) do
     game_pid = MindsterGames.Application.game_pid()
 
-    with {:ok, state} <- GameGenServer.join_game(game_pid, socket.assigns.player_id) do
-      socket
-      |> push_navigate(to: ~p"/#{state.game_state.id}")
-      |> noreply()
-    else
-      _ -> socket |> noreply()
-    end
+    socket =
+      if GameGenServer.already_joined?(game_pid, socket.assigns.player_id) do
+        socket |> push_navigate(to: ~p"/AB12")
+      else
+        case GameGenServer.join_game(game_pid, socket.assigns.player_id) do
+          {:ok, state} -> socket |> push_navigate(to: ~p"/#{state.id}")
+          {:error, _} -> socket
+        end
+      end
+
+    socket |> noreply()
   end
 
   @impl true

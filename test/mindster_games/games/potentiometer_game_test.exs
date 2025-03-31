@@ -15,7 +15,7 @@ defmodule MindsterGames.Games.PotentiometerGameTest do
     GameGenServer.trigger(game_pid, :player_joined, %{player: player3})
     GameGenServer.trigger(game_pid, :player_joined, %{player: player4})
 
-    state = GameGenServer.info(game_pid) |> dbg()
+    state = GameGenServer.info(game_pid)
     assert state.players == [player1, player2, player3, player4]
     assert state.state == :starting_game
   end
