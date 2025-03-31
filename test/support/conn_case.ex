@@ -28,6 +28,8 @@ defmodule MindsterGamesWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import MindsterGamesWeb.ConnCase
+
+      import PhoenixTest
     end
   end
 

@@ -1,4 +1,5 @@
 defmodule MindsterGamesWeb.Live.Index do
+  alias MindsterGames.Games.GameGenServer
   use MindsterGamesWeb, :live_view
 
   @impl true
@@ -31,34 +32,52 @@ defmodule MindsterGamesWeb.Live.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    socket
+    |> assign(page_title: "Welcome")
+    |> ok()
   end
 
   @impl true
   def handle_event("join-room", %{"game_id" => _game_id}, socket) do
-    # TODO: Join Game Logic
-    {:noreply, socket}
+    game_pid = MindsterGames.Application.game_pid()
+
+    socket =
+      if GameGenServer.already_joined?(game_pid, socket.assigns.player_id) do
+        socket |> push_navigate(to: ~p"/AB12")
+      else
+        case GameGenServer.join_game(game_pid, socket.assigns.player_id) do
+          {:ok, state} -> socket |> push_navigate(to: ~p"/#{state.id}")
+          {:error, _} -> socket
+        end
+      end
+
+    socket |> noreply()
   end
 
   @impl true
   def handle_event("create-room", _unsigned_params, socket) do
     # TODO: Create Game Logic
-    {:noreply, socket}
+    socket
+    |> noreply()
   end
 
   defp join_input(assigns) do
     ~H"""
-    <.form for={%{}} class="flex flex-col items-center" phx-submit="join-room">
-      <input
-        id="game_id"
-        name="game_id"
-        class={[
-          "peer rounded-lg py-2 px-3 w-full cursor-pointer",
-          "uppercase placeholder-shown:normal-case font-medium text-2xl placeholder:text-white/80 text-white/80 text-center",
-          "bg-brand hover:bg-brand/10"
-        ]}
-        placeholder="Enter Game Code"
-      />
+    <.form id="join-form" for={%{}} class="flex flex-col items-center" phx-submit="join-room">
+      <label for="game-id">
+        <input
+          id="game-id"
+          name="game_id"
+          class={[
+            "peer rounded-lg py-2 px-3 w-full cursor-pointer",
+            "uppercase placeholder-shown:normal-case font-medium text-2xl placeholder:text-white/80 text-white/80 text-center",
+            "bg-brand hover:bg-brand/10"
+          ]}
+          placeholder="Enter Game Code"
+          pattern="[a-zA-Z0-9]{4}"
+          maxLength="4"
+        />
+      </label>
       <button
         class="text-slate-800 hover:text-slate-900 peer-placeholder-shown:opacity-0"
         tabindex="-1"

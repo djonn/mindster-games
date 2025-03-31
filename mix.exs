@@ -52,7 +52,8 @@ defmodule MindsterGames.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.4"},
       {:bandit, "~> 1.5"},
-      {:state_machine, "~> 0.1.6"}
+      {:state_machine, "~> 0.1.6"},
+      {:phoenix_test, "~> 0.5.2", only: :test, runtime: false}
     ]
   end
 

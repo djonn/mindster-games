@@ -1,7 +1,8 @@
 defmodule MindsterGames.Games.PotentiometerGame do
   use StateMachine
 
-  defstruct players: [],
+  defstruct id: "AB12",
+            players: [],
             teams: [],
             round: 0,
             current_team: nil,
@@ -50,9 +51,13 @@ defmodule MindsterGames.Games.PotentiometerGame do
 
   # Event callbacks to handle payloads
   def add_player(model, %{payload: payload}) do
-    player = payload.player
-    updated_model = %__MODULE__{model | players: model.players ++ [player]}
-    {:ok, updated_model}
+    if Enum.any?(model.players, fn player -> player == payload.player end) do
+      {:ok, model}
+    else
+      player = payload.player
+      updated_model = %__MODULE__{model | players: model.players ++ [player]}
+      {:ok, updated_model}
+    end
   end
 
   def record_guess(model, %{payload: payload}) when is_integer(payload.guess) do
@@ -178,5 +183,9 @@ defmodule MindsterGames.Games.PotentiometerGame do
     hinter = players_on_team |> Enum.at(hinter_index)
 
     {team_index, hinter}
+  end
+
+  def already_joined?(%__MODULE__{} = state, player_id) do
+    Enum.any?(state.players, fn player -> player == player_id end)
   end
 end

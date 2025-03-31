@@ -12,7 +12,7 @@ defmodule MindsterGames.Games.GameGenServerTest do
     test "player can join game", %{game_pid: game_pid} do
       player = "rolf"
       GameGenServer.join_game(game_pid, player)
-      state = GameGenServer.get_current_state(game_pid)
+      state = GameGenServer.info(game_pid)
       assert state.players == [player]
     end
 
@@ -20,7 +20,7 @@ defmodule MindsterGames.Games.GameGenServerTest do
       player = "rolf"
       GameGenServer.join_game(game_pid, player)
       GameGenServer.join_game(game_pid, player)
-      state = GameGenServer.get_current_state(game_pid)
+      state = GameGenServer.info(game_pid)
       assert state.players == [player]
     end
   end
