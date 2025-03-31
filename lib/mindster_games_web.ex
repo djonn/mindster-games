@@ -86,7 +86,7 @@ defmodule MindsterGamesWeb do
       import Phoenix.HTML
       # Core UI components
       import MindsterGamesWeb.CoreComponents
-
+      import MindsterGamesWeb.LiveViewWebHelpers, only: [ok: 1, noreply: 1]
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
