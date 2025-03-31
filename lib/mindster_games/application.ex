@@ -33,6 +33,7 @@ defmodule MindsterGames.Application do
     :ok
   end
 
+  # Hardcoded for now untill we can spawn GameRooms with a dynamic supervisor
   def game_pid() do
     Supervisor.which_children(MindsterGames.Supervisor)
     |> Enum.find(fn child -> elem(child, 0) == MindsterGames.Games.GameGenServer end)
