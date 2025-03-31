@@ -32,22 +32,29 @@ defmodule MindsterGamesWeb.Live.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(page_title: "Welcome")}
+    socket
+    |> assign(page_title: "Welcome")
+    |> ok()
   end
 
   @impl true
   def handle_event("join-room", %{"game_id" => _game_id}, socket) do
     game_pid = MindsterGames.Application.game_pid()
 
-    {:ok, game_state} = GameGenServer.join_game(game_pid, socket.assigns.player)
-
-    {:noreply, socket |> push_navigate(to: ~p"/#{game_state.id}")}
+    with {:ok, state} <- GameGenServer.join_game(game_pid, socket.assigns.player_id) do
+      socket
+      |> push_navigate(to: ~p"/#{state.game_state.id}")
+      |> noreply()
+    else
+      _ -> socket |> noreply()
+    end
   end
 
   @impl true
   def handle_event("create-room", _unsigned_params, socket) do
     # TODO: Create Game Logic
-    {:noreply, socket}
+    socket
+    |> noreply()
   end
 
   defp join_input(assigns) do
