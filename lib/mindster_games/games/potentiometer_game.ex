@@ -62,12 +62,12 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   def rotate_team_and_hinter(model, _ctx) do
-    # Rotate to next hinter and team
-    {next_team_index, next_hinter} = get_next_team_and_hinter(model)
+    next_round = model.round + 1
+    {next_team_index, next_hinter} = get_current_team_and_hinter(%__MODULE__{model | round: next_round})
 
     updated_model = %__MODULE__{
       model
-      | round: model.round + 1,
+      | round: next_round,
         current_team: next_team_index,
         current_hinter: next_hinter
     }
@@ -161,27 +161,16 @@ defmodule MindsterGames.Games.PotentiometerGame do
   end
 
   # Helper functions
-  defp get_next_team_and_hinter(state) do
-    # Switch to the other team
-    next_team_index = rem(state.current_team + 1, length(state.teams))
+  defp get_current_team_and_hinter(state) do
+    team_count = Enum.count(state.teams)
+    team_index = rem(state.round, team_count)
 
-    # Get the next hinter from the team
-    team = Enum.at(state.teams, next_team_index)
+    players_on_team = state.teams |> Enum.at(team_index) |> Map.get(:players)
+    players_on_team_count = Enum.count(players_on_team)
 
-    current_hinter_index =
-      Enum.find_index(team.players, fn player ->
-        player == state.current_hinter
-      end)
+    hinter_index = state.round |> div(team_count) |> rem(players_on_team_count)
+    hinter = players_on_team |> Enum.at(hinter_index)
 
-    next_hinter_index =
-      if current_hinter_index == nil do
-        0
-      else
-        rem(current_hinter_index + 1, length(team.players))
-      end
-
-    next_hinter = Enum.at(team.players, next_hinter_index)
-
-    {next_team_index, next_hinter}
+    {team_index, hinter}
   end
 end
