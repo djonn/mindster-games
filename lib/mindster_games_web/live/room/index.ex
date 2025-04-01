@@ -13,16 +13,20 @@ defmodule MindsterGamesWeb.Live.Room.Index do
   def mount(%{"room_id" => room_id} = _params, _session, socket) do
     game_pid = MindsterGames.Application.game_pid()
 
-    socket =
-      if GameGenServer.already_joined?(game_pid, socket.assigns.player_id) do
-        socket
-      else
-        case GameGenServer.join_game(game_pid, socket.assigns.player_id) do
-          {:ok, _} -> socket
-          {:error, _} -> socket |> push_navigate(to: ~p"/")
-        end
-      end
+    socket
+    |> maybe_join_game(game_pid)
+    |> assign(room_id: room_id)
+    |> ok()
+  end
 
-    socket |> assign(room_id: room_id) |> ok()
+  def maybe_join_game(socket, game_pid) do
+    if connected?(socket) do
+      case GameGenServer.join_game(game_pid, socket.assigns.player_id) do
+        {:ok, _} -> socket
+        {:error, _} -> socket |> push_navigate(to: ~p"/")
+      end
+    else
+      socket
+    end
   end
 end
