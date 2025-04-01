@@ -28,10 +28,6 @@ defmodule MindsterGames.Games.GameGenServer do
     GenServer.call(pid, {:join_game, player_id})
   end
 
-  def already_joined?(pid, player_id) do
-    GenServer.call(pid, {:already_joined?, player_id})
-  end
-
   def info(pid) do
     GenServer.call(pid, :info)
   end
@@ -51,20 +47,20 @@ defmodule MindsterGames.Games.GameGenServer do
   end
 
   def handle_call({:join_game, player_id}, _from, state) do
-    case PotentiometerGame.trigger(state, :player_joined, %{player: player_id}) do
-      {:ok, new_state} ->
-        {:reply, {:ok, new_state}, new_state}
+    if PotentiometerGame.already_joined?(state, player_id) do
+      {:reply, {:ok, state}, state}
+    else
+      case PotentiometerGame.trigger(state, :player_joined, %{player: player_id}) do
+        {:ok, new_state} ->
+          {:reply, {:ok, new_state}, new_state}
 
-      {:error, _} = error ->
-        # The error message here could be improved
-        # when the state machine cannot apply an event it returns
-        # `{:error, {:transition, "Couldn't resolve transition"}}`
-        {:reply, error, state}
+        {:error, _} = error ->
+          # The error message here could be improved
+          # when the state machine cannot apply an event it returns
+          # `{:error, {:transition, "Couldn't resolve transition"}}`
+          {:reply, error, state}
+      end
     end
-  end
-
-  def handle_call({:already_joined?, player_id}, _from, state) do
-    {:reply, PotentiometerGame.already_joined?(state, player_id), state}
   end
 
   def handle_call(:info, _from, state) do
