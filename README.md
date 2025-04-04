@@ -5,8 +5,18 @@
 - [ ] Reconnect based on csrf token
 - [ ] Leave game
 - [ ] Pick name (just csrf token for now)
-- [ ] Create Room and pick game
 - [ ] Allow different game types
+
+Dynamic creation of rooms
+- [ ] Can join game
+- [ ] Can leave game
+- [ ] Can create game
+- [ ] Can end game
+- [ ] Add room_id in form "AB12"
+- [ ] Be able to look up game by its room_id (maybe use :syn)
+- [ ] Be able to call game genserver by its room id (again, :syn)
+- [ ] Have unique ID's (sqlite)
+- [ ] Crash behavior
 
 ## Development
 To start your Phoenix server:
