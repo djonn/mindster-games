@@ -54,3 +54,24 @@ defmodule MindsterGames.Games.Types.ServerToUser do
                optional(:initial) => integer()
              }}
 end
+
+defmodule MindsterGames.Games.Types.UserToServer do
+  @typedoc """
+  Union type for all inputs.
+
+  All inputs follow the basic tuple structure `{ atom(), any() }`.
+  """
+  @type input() ::
+          select_input()
+          | number_range_input()
+
+  @typedoc """
+  The answer to a `select_request()` with the second element of the tuple being the `id` of the selected option
+  """
+  @type select_input() :: {:select, binary()}
+
+  @typedoc """
+  The answer to a `number_range_request()` with the second element of the tuple being the selected integer value
+  """
+  @type number_range_input() :: {:number_range, integer()}
+end
