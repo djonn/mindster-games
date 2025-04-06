@@ -2,18 +2,28 @@ defmodule MindsterGamesWeb.Live.Room.Index do
   use MindsterGamesWeb, :live_view
 
   alias MindsterGames.Games.GameGenServer
-  alias MindsterGamesWeb.Live.Room.InputComponents.NumberRangeComponent
+  alias MindsterGamesWeb.Live.Room.InputComponents.{NumberRangeComponent, SelectComponent}
 
   @impl true
   def render(assigns) do
     ~H"""
     <div class="flex flex-col gap-12 w-full justify-center pb-24">
       <.waiting_for_players :if={@game_state == :waiting_for_players} />
+
       <.live_component
         :if={@game_state == :number_range}
         id="number-range"
         module={NumberRangeComponent}
         game_pid={@game_pid}
+      />
+
+      <.live_component
+        :if={@game_state == :select}
+        id="select"
+        module={SelectComponent}
+        game_pid={@game_pid}
+        title="Pick a hint"
+        options={[%{id: "ready", text: "Ready!"}]}
       />
 
       <.circles />
@@ -55,7 +65,7 @@ defmodule MindsterGamesWeb.Live.Room.Index do
     |> assign(game_pid: game_pid)
     |> assign(room_id: room_id)
     |> assign(page_title: "#{room_id}")
-    |> assign(game_state: :number_range)
+    |> assign(game_state: :select)
     |> ok()
   end
 
