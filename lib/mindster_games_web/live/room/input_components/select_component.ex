@@ -29,7 +29,8 @@ defmodule MindsterGamesWeb.Live.Room.InputComponents.SelectComponent do
   end
 
   def handle_event("submit", %{"value" => value}, socket) do
-    GameGenServer.trigger(socket.assigns.game_pid, :select, value) |> dbg()
+    GameGenServer.trigger(socket.assigns.game_pid, :select, value)
+    send(self(), :submitted)
     socket |> noreply()
   end
 end

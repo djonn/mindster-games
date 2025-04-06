@@ -32,7 +32,7 @@ defmodule MindsterGamesWeb.Live.Room.Index do
   end
 
   defp waiting_for_players(assigns) do
-    assigns = assigns |> assign(:text, Map.get(assigns.data, :title, "Waiting for other players"))
+    assigns = assigns |> assign(:text, Map.get(assigns.data, :title, "Waiting"))
 
     ~H"""
     <div class="w-full items-center flex flex-col content-center gap-1.5 text-slate-900">
@@ -74,6 +74,11 @@ defmodule MindsterGamesWeb.Live.Room.Index do
     |> assign(page_title: "#{room_id}")
     |> assign_request(request)
     |> ok()
+  end
+
+  @impl true
+  def handle_info(:submitted, socket) do
+    socket |> assign_request({:wait, %{}}) |> noreply()
   end
 
   def maybe_join_game(socket, game_pid) do

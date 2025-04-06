@@ -41,7 +41,8 @@ defmodule MindsterGamesWeb.Live.Room.InputComponents.NumberRangeComponent do
   end
 
   def handle_event("submit", %{"value" => value}, socket) do
-    GameGenServer.trigger(socket.assigns.game_pid, :number_range, value) |> dbg()
+    GameGenServer.trigger(socket.assigns.game_pid, :number_range, value)
+    send(self(), :submitted)
     socket |> noreply()
   end
 end

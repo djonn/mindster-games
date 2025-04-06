@@ -18,7 +18,7 @@ defmodule MindsterGames.Games.Types.ServerToUser do
   - `title` prompt the user sees above the number range input
   """
   @type wait_request() ::
-          {:wait, nil} | {:wait, %{optional(:title) => String.t()}}
+          {:wait, %{optional(:title) => String.t()}}
 
   @typedoc """
   Select request displays a series of buttons for the user to click one of
@@ -28,12 +28,11 @@ defmodule MindsterGames.Games.Types.ServerToUser do
   - `options` a list of tuples containing an `id` and the `text` to display to the user
   """
   @type select_request() ::
-          {:select, nil}
-          | {:select,
-             %{
-               optional(:title) => String.t(),
-               options: list({String.t(), String.t()})
-             }}
+          {:select,
+           %{
+             optional(:title) => String.t(),
+             options: list({String.t(), String.t()})
+           }}
 
   @typedoc """
   Number range request displays a range input to the user
@@ -45,14 +44,13 @@ defmodule MindsterGames.Games.Types.ServerToUser do
   - `initial` initial value for the number range input
   """
   @type number_range_request() ::
-          {:number_range, nil}
-          | {:number_range,
-             %{
-               optional(:title) => String.t(),
-               optional(:min) => integer(),
-               optional(:max) => integer(),
-               optional(:initial) => integer()
-             }}
+          {:number_range,
+           %{
+             optional(:title) => String.t(),
+             optional(:min) => integer(),
+             optional(:max) => integer(),
+             optional(:initial) => integer()
+           }}
 end
 
 defmodule MindsterGames.Games.Types.UserToServer do
