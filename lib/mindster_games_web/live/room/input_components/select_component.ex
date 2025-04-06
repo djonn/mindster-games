@@ -3,10 +3,15 @@ defmodule MindsterGamesWeb.Live.Room.InputComponents.SelectComponent do
 
   alias MindsterGames.Games.GameGenServer
 
-  attr :title, :string, default: "Pick one"
-  attr :options, :list, required: true
+  @default_attributes %{
+    title: "Pick one"
+  }
+
+  attr :data, :map, required: true
 
   def render(assigns) do
+    assigns = assigns |> assign(Map.merge(@default_attributes, assigns.data))
+
     ~H"""
     <div class="flex flex-col gap-2">
       <p class="text-4xl font-semibold text-center pb-4">{@title}</p>

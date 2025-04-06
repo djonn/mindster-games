@@ -3,11 +3,25 @@ defmodule MindsterGamesWeb.Live.Room.InputComponents.NumberRangeComponent do
 
   alias MindsterGames.Games.GameGenServer
 
+  @default_attributes %{
+    title: "",
+    min: 0,
+    max: 100,
+    initial: 50
+  }
+
+  attr :data, :map, required: true
+
   def render(assigns) do
+    assigns =
+      assigns
+      |> assign(Map.merge(@default_attributes, assigns.data))
+
     # Use in future
     # https://codepen.io/josetxu/pen/oNQxxyZ
     ~H"""
     <div>
+      <p class="text-4xl font-semibold text-center pb-4">{@title}</p>
       <.form
         id="number-range-form"
         for={%{}}
@@ -16,9 +30,9 @@ defmodule MindsterGamesWeb.Live.Room.InputComponents.NumberRangeComponent do
         phx-submit="submit"
       >
         <label for="value">
-          <input type="range" id="value" name="value" min="0" max="100" value="50" />
+          <input type="range" id="value" name="value" min={@min} max={@max} value={@initial} />
         </label>
-        <button class="text-slate-800 hover:text-slate-900">
+        <button class="px-3 py-2 bg-violet-400/80 rounded-lg hover:bg-violet-400/60 text-white font-medium">
           Submit
         </button>
       </.form>
